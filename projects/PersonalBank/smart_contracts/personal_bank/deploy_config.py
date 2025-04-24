@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 # define deployment behaviour based on supplied app spec
 def deploy() -> None:
     from smart_contracts.artifacts.personal_bank.personal_bank_client import (
-        HelloArgs,
+        DepositArgs,
         PersonalBankFactory,
     )
 
@@ -35,10 +35,3 @@ def deploy() -> None:
                 receiver=app_client.app_address,
             )
         )
-
-    name = "world"
-    response = app_client.send.hello(args=HelloArgs(name=name))
-    logger.info(
-        f"Called hello on {app_client.app_name} ({app_client.app_id}) "
-        f"with name={name}, received: {response.abi_return}"
-    )
