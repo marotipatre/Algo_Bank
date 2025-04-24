@@ -23,6 +23,9 @@ def deploy() -> None:
         on_update=algokit_utils.OnUpdate.AppendApp,
         on_schema_break=algokit_utils.OnSchemaBreak.AppendApp,
     )
+    logger.info(
+        f"Deployed app {app_client.app_id} with address {app_client.app_address}"
+    )
 
     if result.operation_performed in [
         algokit_utils.OperationPerformed.Create,
