@@ -1,4 +1,4 @@
-from algopy import Account, ARC4Contract, BoxMap, Global, Txn, UInt64, gtxn, itxn, String
+from algopy import Account, ARC4Contract, BoxMap, Global, Txn, UInt64, gtxn, itxn, String,Box
 from algopy.arc4 import abimethod
 
 
@@ -11,7 +11,7 @@ class PersonalBank(ARC4Contract):
         The BoxMap uses Account addresses as keys and UInt64 values to track deposited amounts.
         """
         self.depositors = BoxMap(Account, UInt64,key_prefix="")
-        self.github = BoxMap(Account, String, key_prefix="")
+        self.github = Box(String, key=b"git")
 
     @abimethod()
     def deposit(self, user:String,pay_txn: gtxn.PaymentTransaction) -> UInt64:
@@ -38,15 +38,13 @@ class PersonalBank(ARC4Contract):
         else:
             self.depositors[pay_txn.sender] = pay_txn.amount
 
-        name, entered = self.github.maybe(pay_txn.sender)
-        if not entered:
-            self.github[pay_txn.sender] = user
+        self.github.value = user
      
 
         return self.depositors[pay_txn.sender]
 
     @abimethod()
-    def withdraw(self) -> UInt64:
+    def withdraw(self) -> String:
         """Withdraws all funds from the sender's account
 
         This method transfers the entire balance of the sender's account back to them,
@@ -58,6 +56,8 @@ class PersonalBank(ARC4Contract):
         deposit_amt, deposited = self.depositors.maybe(Txn.sender)
         assert deposited, "No deposits found for this account"
 
+        
+
         result = itxn.Payment(
             receiver=Txn.sender,
             amount=deposit_amt,
@@ -66,4 +66,6 @@ class PersonalBank(ARC4Contract):
 
         self.depositors[Txn.sender] = UInt64(0)
 
-        return result.amount
+        user = self.github.value
+
+        return "Withdrawn whole money from account" + user

@@ -4,12 +4,12 @@
 // smart_contracts.personal_bank.contract.PersonalBank.__algopy_entrypoint_with_init() -> uint64:
 main:
     intcblock 1 0
-    bytecblock 0x151f7c75
+    bytecblock 0x676974 0x151f7c75
     // smart_contracts/personal_bank/contract.py:5
     // class PersonalBank(ARC4Contract):
     txn NumAppArgs
     bz main_bare_routing@7
-    pushbytess 0x9f597c32 0x3a395f2b // method "deposit(string,pay)uint64", method "withdraw()uint64"
+    pushbytess 0x9f597c32 0xa1ffde06 // method "deposit(string,pay)uint64", method "withdraw()string"
     txna ApplicationArgs 0
     match main_deposit_route@5 main_withdraw_route@6
 
@@ -20,7 +20,7 @@ main_after_if_else@9:
     return
 
 main_withdraw_route@6:
-    // smart_contracts/personal_bank/contract.py:48
+    // smart_contracts/personal_bank/contract.py:46
     // @abimethod()
     txn OnCompletion
     !
@@ -28,8 +28,13 @@ main_withdraw_route@6:
     txn ApplicationID
     assert // can only call when not creating
     callsub withdraw
+    dup
+    len
     itob
-    bytec_0 // 0x151f7c75
+    extract 6 2
+    swap
+    concat
+    bytec_1 // 0x151f7c75
     swap
     concat
     log
@@ -60,7 +65,7 @@ main_deposit_route@5:
     // @abimethod()
     callsub deposit
     itob
-    bytec_0 // 0x151f7c75
+    bytec_1 // 0x151f7c75
     swap
     concat
     log
@@ -128,24 +133,14 @@ deposit:
 
 deposit_after_if_else@3:
     // smart_contracts/personal_bank/contract.py:41
-    // name, entered = self.github.maybe(pay_txn.sender)
-    frame_dig 1
-    box_get
-    bury 1
-    // smart_contracts/personal_bank/contract.py:42
-    // if not entered:
-    bnz deposit_after_if_else@5
-    // smart_contracts/personal_bank/contract.py:43
-    // self.github[pay_txn.sender] = user
-    frame_dig 1
-    dup
+    // self.github.value = user
+    bytec_0 // 0x676974
     box_del
     pop
+    bytec_0 // 0x676974
     frame_dig -2
     box_put
-
-deposit_after_if_else@5:
-    // smart_contracts/personal_bank/contract.py:46
+    // smart_contracts/personal_bank/contract.py:44
     // return self.depositors[pay_txn.sender]
     frame_dig 1
     box_get
@@ -167,15 +162,15 @@ deposit_else_body@2:
     b deposit_after_if_else@3
 
 
-// smart_contracts.personal_bank.contract.PersonalBank.withdraw() -> uint64:
+// smart_contracts.personal_bank.contract.PersonalBank.withdraw() -> bytes:
 withdraw:
-    // smart_contracts/personal_bank/contract.py:58
+    // smart_contracts/personal_bank/contract.py:56
     // deposit_amt, deposited = self.depositors.maybe(Txn.sender)
     txn Sender
     box_get
     swap
     btoi
-    // smart_contracts/personal_bank/contract.py:59
+    // smart_contracts/personal_bank/contract.py:57
     // assert deposited, "No deposits found for this account"
     swap
     assert // No deposits found for this account
@@ -206,7 +201,6 @@ withdraw:
     //     fee=0,
     // ).submit()
     itxn_submit
-    itxn Amount
     // smart_contracts/personal_bank/contract.py:67
     // self.depositors[Txn.sender] = UInt64(0)
     txn Sender
@@ -214,5 +208,13 @@ withdraw:
     itob
     box_put
     // smart_contracts/personal_bank/contract.py:69
-    // return result.amount
+    // user = self.github.value
+    bytec_0 // 0x676974
+    box_get
+    assert // check self.github exists
+    // smart_contracts/personal_bank/contract.py:71
+    // return "Withdrawn whole money from account" + user
+    pushbytes "Withdrawn whole money from account"
+    swap
+    concat
     retsub
