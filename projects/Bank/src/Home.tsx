@@ -3,6 +3,10 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useState } from 'react'
 import ConnectWallet from './components/ConnectWallet'
 import Transact from './components/Transact'
+import Navbar from './components/Navbar'
+import AccountCard from './components/AccountCard'
+import QuickActions from './components/QuickActions'
+
 
 const Home: React.FC = () => {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
