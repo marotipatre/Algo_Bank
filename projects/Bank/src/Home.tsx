@@ -69,6 +69,14 @@ const Home: React.FC = () => {
             </div>
           </div>
         )}
+
+        <Navbar onConnectClick={toggleWalletModal} connected={!!activeAddress} />
+
+<AccountCard title="Wallet Address" content={activeAddress || 'Not connected'} />
+<AccountCard title="Total Balance" content="ALGO 0.00" highlight />
+<AccountCard title="Recent Activity" content="No recent transactions" />
+
+{activeAddress && <QuickActions onTransactionClick={toggleDemoModal} />}
       </main>
 
       {/* Modals */}
