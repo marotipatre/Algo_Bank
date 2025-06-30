@@ -6,6 +6,9 @@
     },
     {
       "path": "projects/PersonalBank"
+    },
+    {
+      "path": "projects/Bank"
     }
   ],
   "settings": {
